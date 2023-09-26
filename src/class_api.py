@@ -1,5 +1,6 @@
 import os
 from abc import ABC, abstractmethod
+from datetime import datetime
 
 import requests
 
@@ -55,6 +56,10 @@ class HeadHunterAPI(API):
         lst_vacancies = []
 
         for vacancy in vacancies:
+            # преобразовываем дату в читаемый вид
+            date_obj = datetime.strptime(vacancy['published_at'][:10], '%Y-%m-%d')
+            format_date = datetime.strftime(date_obj, '%d-%m-%Y')
+
             item = {
                 'title': vacancy['name'],  # наименование вакансии
                 'link': vacancy['alternate_url'],  # ссылка на вакансию
@@ -63,7 +68,7 @@ class HeadHunterAPI(API):
                 'salary_from': vacancy['salary']['from'],  # нижняя планка зарплаты
                 'salary_to': vacancy['salary']['to'],  # предел зарплаты
                 'description': vacancy['snippet']['requirement'],  # краткое описание вакансии
-                'date': vacancy['published_at']  # дата публикации вакансии
+                'date': format_date  # дата публикации вакансии
             }
             lst_vacancies.append(item)
         return lst_vacancies
@@ -102,6 +107,10 @@ class SuperJobAPI(API):
         lst_vacancies = []
 
         for vacancy in vacancies:
+            # преобразовываем дату в читаемый вид
+            date = datetime.fromtimestamp(vacancy['date_pub_to'])
+            format_date = date.strftime("%d-%m-%Y")
+
             item = {
                 'title': vacancy['profession'],  # наименование вакансии
                 'link': vacancy['link'],  # ссылка на вакансию
@@ -110,8 +119,7 @@ class SuperJobAPI(API):
                 'salary_from': vacancy['payment_from'],  # нижняя планка зарплаты
                 'salary_to': vacancy['payment_to'],  # предел зарплаты
                 'description': vacancy['work'],  # краткое описание вакансии
-                'date': vacancy['date_pub_to']  # дата публикации вакансии
+                'date': format_date  # дата публикации вакансии
             }
             lst_vacancies.append(item)
         return lst_vacancies
-
